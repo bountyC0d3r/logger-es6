@@ -16,35 +16,56 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Logger = function () {
     function Logger(fileName) {
+        var ferq = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'd';
+        var size = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+
         _classCallCheck(this, Logger);
 
         this.fileName = fileName;
-    }
 
-    _createClass(Logger, [{
-        key: 'writeFile',
-        value: function writeFile() {
-            var fileName = this.fileName;
-
-            _fs2.default.open(fileName, 'a+', function (err, fd) {
+        if (ferq === 'd') {
+            _fs2.default.stat('input.txt', function (err, stats) {
                 if (err) {
                     return console.error(err);
                 }
-                console.log("File opened successfully!" + fileName);
-                _fs2.default.writeFile(fileName, "Hey there!", function (err) {
-                    if (err) {
-                        return console.log(err);
-                    }
+                console.log(stats);
+                console.log("Got file info successfully!");
 
-                    console.log("The file was saved!");
-                });
+                // Check file type
+                console.log("isFile ? " + stats.isFile());
+                console.log("isDirectory ? " + stats.isDirectory());
+            });
+
+            _fs2.default.open(this.fileName, 'a+', function (err, fd) {
+                if (err) {
+                    return console.error(err);
+                }
 
                 _fs2.default.close(fd, function (err) {
                     if (err) {
                         console.log(err);
                     }
-                    console.log("File closed successfully.");
                 });
+            });
+        }
+    }
+
+    _createClass(Logger, [{
+        key: 'debug',
+        value: function debug(debugString, debugData) {
+            _fs2.default.appendFile(this.fileName, "DEBUG: " + debugString + " : " + debugData + '\r\n', function (err) {
+                if (err) {
+                    return console.log(err);
+                }
+            });
+        }
+    }, {
+        key: 'info',
+        value: function info(infoString) {
+            _fs2.default.appendFile(this.fileName, "INFO: " + infoString + '\r\n', function (err) {
+                if (err) {
+                    return console.log(err);
+                }
             });
         }
     }]);
