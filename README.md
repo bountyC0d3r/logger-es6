@@ -32,7 +32,7 @@ let logger = Logger.configure(
 
 ###Start Logging
 - logger.info("This is info message ");
-- logger.debug("Log Message", Log Details);
-- logger.error("Error Message", Error Details);
+- logger.debug("Log Message", "Log Details");
+- logger.error("Error Message", "Error Details");
 
 
