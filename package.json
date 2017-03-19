@@ -1,5 +1,5 @@
 {
-  "name": "logger-es6",
+  "name": "node-logger-es6",
   "version": "1.0.0",
   "description": "Node Server Logger",
   "main": "distribution/index.js",
