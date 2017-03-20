@@ -30,9 +30,20 @@ let logger = Logger.configure(
 );
 ```
 
-###Start Logging
+### Start Logging
 - logger.info("This is info message ");
 - logger.debug("Log Message", "Log Details");
 - logger.error("Error Message", "Error Details");
+
+---
+## TODO
+- [ ] Add functionality for file rotation on week/month/custom basis
+- [ ] Add functionality for file size constraint
+- [ ] Pretty print
+- [ ] Archive old log files
+
+
+---
+**_Suggestions are welcomed. Send out them on dushyantbhalgami@gmail.com_**
 
 
