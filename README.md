@@ -39,7 +39,7 @@ let logger = Logger.configure(
 
 ---
 ## TODO
-- [X] Add functionality for file rotation on week/month/custom basis
+- [X] Add functionality for file rotation on week basis
 - [ ] Add functionality for file rotation on month/custom basis
 - [x] Add functionality for file size constraint
 - [ ] Pretty print
