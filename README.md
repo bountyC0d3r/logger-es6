@@ -19,6 +19,8 @@ npm install node-logger-es6
     -  json: Create log in JSON format; default value `true`,
      - timestamp: Include timestamp with each log line; default value `true`
 ```$xslt
+import Logger from 'node-logger-es6'
+
 let logger = Logger.configure(
     {
         level: 'debug',

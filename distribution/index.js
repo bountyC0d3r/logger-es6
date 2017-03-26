@@ -35,12 +35,37 @@ var Logger = function () {
     }
 
     _createClass(Logger, [{
+        key: '_checkFileSize',
+        value: function _checkFileSize(fileName, logSize) {
+            _fs2.default.stat(fileName, function (err, stat) {
+                if (parseInt(stat.size / 1048576) > logSize) {
+                    _fs2.default.rename(fileName, fileName + '.' + (0, _moment2.default)(stat.birthtime).format('MM_DD_YYYY'), function (err) {
+                        if (err) console.log('ERROR: ' + err);
+
+                        _fs2.default.open(fileName, 'a+', function (err, fd) {
+                            if (err) {
+                                return console.error(err);
+                            }
+
+                            _fs2.default.close(fd, function (err) {
+                                if (err) {
+                                    console.log(err);
+                                }
+                            });
+                        });
+                    });
+                }
+            });
+        }
+    }, {
         key: 'info',
         value: function info(infoMessage) {
             var logData = {};
             logData['LEVEL'] = this.logLevel;
             logData['MESSAGE'] = infoMessage;
             logData['TIMESTAMP'] = (0, _moment2.default)((0, _moment2.default)(), 'M/D/YYYY');
+
+            this._checkFileSize(this.logFileName, this.logSize);
 
             _fs2.default.appendFile(this.logFileName, JSON.stringify(logData) + '\r\n', function (err) {
                 if (err) {
@@ -57,6 +82,8 @@ var Logger = function () {
             logData['DETAILS'] = debugData;
             logData['TIMESTAMP'] = (0, _moment2.default)((0, _moment2.default)(), 'M/D/YYYY');
 
+            this._checkFileSize(this.logFileName, this.logSize);
+
             _fs2.default.appendFile(this.logFileName, JSON.stringify(logData) + '\r\n', function (err) {
                 if (err) {
                     return console.log(err);
@@ -71,6 +98,8 @@ var Logger = function () {
             logData['MESSAGE'] = errorMessage;
             logData['DETAILS'] = errorData;
             logData['TIMESTAMP'] = (0, _moment2.default)((0, _moment2.default)(), 'M/D/YYYY');
+
+            this._checkFileSize(this.errorFileName, this.logSize);
 
             _fs2.default.appendFile(this.errorFileName, JSON.stringify(logData) + '\r\n', function (err) {
                 if (err) {
@@ -119,28 +148,49 @@ var Logger = function () {
                     return console.error(err);
                 }
 
-                if (logRotation === 'd') {
-                    var today = (0, _moment2.default)((0, _moment2.default)(), 'M/D/YYYY');
-                    var fileDate = (0, _moment2.default)((0, _moment2.default)(stat.birthtime), 'M/D/YYYY');
-                    var diffHours = today.diff(fileDate, 'hours');
+                var today = (0, _moment2.default)((0, _moment2.default)(), 'M/D/YYYY');
+                var fileDate = (0, _moment2.default)((0, _moment2.default)(stat.birthtime), 'M/D/YYYY');
+                var diffHours = today.diff(fileDate, 'hours');
 
-                    if (parseInt(diffHours) - parseInt((0, _moment2.default)().startOf('day').fromNow()) > 1) {
-                        _fs2.default.rename(fileName, fileName + '.' + (0, _moment2.default)(stat.birthtime).format('MM_DD_YYYY'), function (err) {
-                            if (err) console.log('ERROR: ' + err);
+                switch (logRotation) {
+                    case 'd':
+                        if (parseInt(diffHours) > 1 || parseInt(stat.size / 1048576) > logSize) {
+                            _fs2.default.rename(fileName, fileName + '.' + (0, _moment2.default)(stat.birthtime).format('MM_DD_YYYY'), function (err) {
+                                if (err) console.log('ERROR: ' + err);
 
-                            _fs2.default.open(fileName, 'a+', function (err, fd) {
-                                if (err) {
-                                    return console.error(err);
-                                }
-
-                                _fs2.default.close(fd, function (err) {
+                                _fs2.default.open(fileName, 'a+', function (err, fd) {
                                     if (err) {
-                                        console.log(err);
+                                        return console.error(err);
                                     }
+
+                                    _fs2.default.close(fd, function (err) {
+                                        if (err) {
+                                            console.log(err);
+                                        }
+                                    });
                                 });
                             });
-                        });
-                    }
+                        }
+                        break;
+                    case 'w':
+                        if (parseInt(diffHours) > 168 || parseInt(stat.size / 1048576) > logSize) {
+                            _fs2.default.rename(fileName, fileName + '.' + (0, _moment2.default)(stat.birthtime).format('MM_DD_YYYY'), function (err) {
+                                if (err) console.log('ERROR: ' + err);
+
+                                _fs2.default.open(fileName, 'a+', function (err, fd) {
+                                    if (err) {
+                                        return console.error(err);
+                                    }
+
+                                    _fs2.default.close(fd, function (err) {
+                                        if (err) {
+                                            console.log(err);
+                                        }
+                                    });
+                                });
+                            });
+                        }
+                        break;
                 }
             });
         }

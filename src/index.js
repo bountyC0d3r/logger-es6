@@ -25,7 +25,7 @@ class Logger {
         let logFileName = 'logs/app_log_current.log';
         let errorFileName = 'logs/error_log_current.log';
 
-        if (!fs.existsSync('logs')){
+        if (!fs.existsSync('logs')) {
             fs.mkdirSync('logs');
         }
 
@@ -53,32 +53,74 @@ class Logger {
                 return console.error(err);
             }
 
-            if (logRotation === 'd') {
-                let today = moment(moment(), 'M/D/YYYY');
-                let fileDate = moment(moment(stat.birthtime), 'M/D/YYYY');
-                let diffHours = today.diff(fileDate, 'hours');
+            let today = moment(moment(), 'M/D/YYYY');
+            let fileDate = moment(moment(stat.birthtime), 'M/D/YYYY');
+            let diffHours = today.diff(fileDate, 'hours');
 
-                if (parseInt(diffHours) - parseInt((moment().startOf('day').fromNow())) > 1) {
-                    fs.rename(fileName, fileName + '.' + moment(stat.birthtime).format('MM_DD_YYYY'), function (err) {
-                        if (err) console.log('ERROR: ' + err);
+            switch (logRotation) {
+                case 'd':
+                    if (parseInt(diffHours) > 1 || parseInt(stat.size / 1048576) > logSize) {
+                        fs.rename(fileName, fileName + '.' + moment(stat.birthtime).format('MM_DD_YYYY'), function (err) {
+                            if (err) console.log('ERROR: ' + err);
 
-                        fs.open(fileName, 'a+', function (err, fd) {
-                            if (err) {
-                                return console.error(err);
-                            }
-
-                            fs.close(fd, function (err) {
+                            fs.open(fileName, 'a+', function (err, fd) {
                                 if (err) {
-                                    console.log(err);
+                                    return console.error(err);
                                 }
+
+                                fs.close(fd, function (err) {
+                                    if (err) {
+                                        console.log(err);
+                                    }
+                                });
                             });
                         });
-                    });
-                }
+                    }
+                    break;
+                case 'w':
+                    if (parseInt(diffHours) > 168 || parseInt(stat.size / 1048576) > logSize) {
+                        fs.rename(fileName, fileName + '.' + moment(stat.birthtime).format('MM_DD_YYYY'), function (err) {
+                            if (err) console.log('ERROR: ' + err);
+
+                            fs.open(fileName, 'a+', function (err, fd) {
+                                if (err) {
+                                    return console.error(err);
+                                }
+
+                                fs.close(fd, function (err) {
+                                    if (err) {
+                                        console.log(err);
+                                    }
+                                });
+                            });
+                        });
+                    }
+                    break;
             }
         });
     }
 
+    _checkFileSize(fileName, logSize) {
+        fs.stat(fileName, function (err, stat) {
+            if(parseInt(stat.size / 1048576) > logSize) {
+                fs.rename(fileName, fileName + '.' + moment(stat.birthtime).format('MM_DD_YYYY'), function (err) {
+                    if (err) console.log('ERROR: ' + err);
+
+                    fs.open(fileName, 'a+', function (err, fd) {
+                        if (err) {
+                            return console.error(err);
+                        }
+
+                        fs.close(fd, function (err) {
+                            if (err) {
+                                console.log(err);
+                            }
+                        });
+                    });
+                });
+            }
+        });
+    }
 
 
     info(infoMessage) {
@@ -86,6 +128,8 @@ class Logger {
         logData['LEVEL'] = this.logLevel;
         logData['MESSAGE'] = infoMessage;
         logData['TIMESTAMP'] = moment(moment(), 'M/D/YYYY');
+
+        this._checkFileSize(this.logFileName, this.logSize);
 
         fs.appendFile(this.logFileName, JSON.stringify(logData) + '\r\n', function (err) {
             if (err) {
@@ -102,6 +146,8 @@ class Logger {
         logData['DETAILS'] = debugData;
         logData['TIMESTAMP'] = moment(moment(), 'M/D/YYYY');
 
+        this._checkFileSize(this.logFileName, this.logSize);
+
         fs.appendFile(this.logFileName, JSON.stringify(logData) + '\r\n', function (err) {
             if (err) {
                 return console.log(err);
@@ -110,13 +156,14 @@ class Logger {
     }
 
 
-
     error(errorMessage, errorData) {
         let logData = {};
         logData['LEVEL'] = this.logLevel;
         logData['MESSAGE'] = errorMessage;
         logData['DETAILS'] = errorData;
         logData['TIMESTAMP'] = moment(moment(), 'M/D/YYYY');
+
+        this._checkFileSize(this.errorFileName, this.logSize)
 
         fs.appendFile(this.errorFileName, JSON.stringify(logData) + '\r\n', function (err) {
             if (err) {
