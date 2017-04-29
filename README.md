@@ -40,10 +40,15 @@ let logger = Logger.configure(
 ---
 ## TODO
 - [X] Add functionality for file rotation on week basis
-- [ ] Add functionality for file rotation on month/custom basis
+- [x] Add functionality for file rotation on month basis
+- [ ] Add functionality for file rotation on custom duration basis
 - [x] Add functionality for file size constraint
-- [ ] Pretty print
-- [ ] Archive old log files
+- [x] Pretty print
+- [x] Archive old log files (Archive old log files when count of old log files are more than 10
+
+## New Features Coming, Stay Tuned !!!
+- [ ] Remote logging
+- [ ] Move Archived Log Files to Cloud (Amazon S3/Google Drive)
 
 
 ---
