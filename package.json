@@ -21,7 +21,7 @@
     "url": "https://github.com/dushyantb/logger-es6/issues"
   },
   "homepage": "https://github.com/dushyantb/logger-es6#readme",
-  "devDependencies": {
+  "dependencies": {
     "archiver-promise": "^1.0.0",
     "babel-cli": "^6.24.0",
     "babel-core": "^6.24.1",
