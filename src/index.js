@@ -97,7 +97,7 @@ class Logger {
         }
     }
 
-    static async _createLogFile(fileName, logRotation, logSize) {
+    static _createLogFile(fileName, logRotation, logSize) {
         fse.ensureFileSync(fileName);
 
         fs.stat(fileName, function (err, stat) {

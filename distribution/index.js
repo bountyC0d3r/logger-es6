@@ -192,7 +192,7 @@ var Logger = function () {
         }
     }, {
         key: '_createLogFile',
-        value: async function _createLogFile(fileName, logRotation, logSize) {
+        value: function _createLogFile(fileName, logRotation, logSize) {
             _fsExtra2.default.ensureFileSync(fileName);
 
             _fs2.default.stat(fileName, function (err, stat) {
